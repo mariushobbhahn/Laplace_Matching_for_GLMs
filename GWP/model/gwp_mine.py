@@ -200,9 +200,9 @@ class GeneralizedWishartProcess(object):
                             i = p * self.T + n1
                             j = p * self.T + n2
                             if self.parameters['USE_SUM_KERNEL']:
-                                k_value = sum_kernel(times[n1], times[n2], k1, k2, [sig1, tau1[p]], [sig2, tau2[p]])
+                                k_value = sum_kernel(times[n1], times[n2], k1, k2, [sig1, tau1[p], 16], [sig2, tau2[p]])
                             else:
-                                k_value = k(times[n1], times[n2], [self.parameters['SIG_VAR'], taus[p], 20])
+                                k_value = k(times[n1], times[n2], [self.parameters['SIG_VAR'], taus[p], 16])
                                 #k_value = k(times[n1], times[n2], [self.parameters['SIG_VAR'], 1, taus[p]]) #adapt periodicity
                             #k_value = k(times[t1], times[t2], [tau, self.parameters['SIG_VAR']])
                             K[i, j] = k_value
@@ -268,7 +268,7 @@ class GeneralizedWishartProcess(object):
             term = -0.5*(self.data[:, t]-mu).T @ cho_solve(L_chol, (self.data[:, t] - mu).T).T
             loglik += term
         """
-        #u_ = u.reshape(self.T, self.Nu_plus * self.D) #reshape such that rows are one u vector; I think this is correct but am confused
+        
         u_ = u.reshape(self.Nu_plus * self.D, self.T) #reshape such that cols are one u vector
         """
         plt.figure(figsize=(10,10))
@@ -276,7 +276,6 @@ class GeneralizedWishartProcess(object):
         plt.show();
         """
         for t in range(self.T):
-            #u_current = u_[t, :self.D*self.Nu] #go through row by row; I think this is correct but am confused
             u_current = u_[:self.D*self.Nu, t] #go through col by col
             assert(len(u_current) == self.Nu * self.D)
             Sig_ = self.compute_sigma(L, u_current)
@@ -289,7 +288,6 @@ class GeneralizedWishartProcess(object):
                 mu = np.zeros(self.D)
             assert(len(mu) == self.D)
             norm_const_ = -self.D/2 * np.log(2 * np.pi) - 1/2 * np.log(np.linalg.det(Sig_))
-            #norm_const_ = - 1/2 * np.log(np.linalg.det(Sig_))
             term = norm_const_ - 0.5*(self.data[:, t]-mu).T @ cho_solve(L_chol, (self.data[:, t] - mu).T).T
             loglik += term
             
@@ -366,7 +364,6 @@ class GeneralizedWishartProcess(object):
         if self.parameters['USE_SUM_KERNEL']:
             tau = tau.reshape(2, -1)
         K = self._construct_kernel(tau, range(T))
-        #Kinv = np.linalg.inv(K)
         #use cholesky to invert the Kernel
         #""" #use an alternate implementation of ESS
         L_chol, _ = cho_factor(K, lower=True)
@@ -419,12 +416,8 @@ class GeneralizedWishartProcess(object):
             if self.parameters['USE_SUM_KERNEL']:
                 logtaup = logtaup.reshape(2, -1)
             K = self._construct_kernel(np.exp(logtaup), range(T))
-            #Kinv = np.linalg.inv(K) #K is psd and thus should be inverted using cholesky decompositions
-            #L_chol = cho_factor(K)
-            #log_u_prob = -0.5*np.matmul(u, np.matmul(Kinv, u))
-            #log_u_prob = -0.5* u @ cho_solve(L_chol, u.T).T
+            #det_prob = -0.5 * np.log(np.linalg.det(K)) #numerical problems because K is so large
             log_u_prob = -0.5*u @ self._invert_block_kernel(K_B=K, mult=u).T
-            #log_u_prob = self._log_data_likelihood(u, L)
             mean = self.parameters['TAU_PRIOR_MEAN']
             var = self.parameters['TAU_PRIOR_VAR']
             log_prior = np.sum(-0.5*((logtaup - mean)**2/var))
@@ -436,12 +429,14 @@ class GeneralizedWishartProcess(object):
         if MCMC:
             #print("drawing logtau MCMC!")
             dim = np.prod(logtau.shape)
-            scale = 1/10 #dim
+            scale = 1/1000 #dim
             sampler = emcee.MHSampler(np.eye(dim) * scale, dim=dim, lnprobfn=_log_logtau_prob)
-            #random_cov = create_spd_matrix(p=dim, eps=0.001)
-            #sampler = emcee.MHSampler(random_cov, dim=dim, lnprobfn=_log_logtau_prob)
             #the scale parameter seems to help prevent the MC sampler to get stuck
             logtaup, _, _ = sampler.run_mcmc(logtau.reshape(-1), MC_samples)
+            #acceptance_fraction = sampler.acceptance_fraction
+            #autocorr = sampler.acor
+            #print("acceptance fraction: ", acceptance_fraction)
+            #print("autocorr: ", autocorr)
         else:
             logtaup = logtau
             
@@ -477,8 +472,6 @@ class GeneralizedWishartProcess(object):
         if MCMC:
             dim = int((L.shape[0]**2 + L.shape[0])/2)
             scale= 1/10 #dim
-            #random_cov = create_spd_matrix(p=dim, eps=0.001)
-            #sampler = emcee.MHSampler(random_cov, dim=dim, lnprobfn=_log_L_prob)
             sampler = emcee.MHSampler(np.eye(dim) * scale, dim=dim, lnprobfn=_log_L_prob)
             #the scale denotes the correlation the samples should have
             Lp, _, _ = sampler.run_mcmc(L[np.tril_indices(L.shape[0])], MC_samples)
@@ -690,11 +683,9 @@ class GeneralizedWishartProcess(object):
             
             Sigma_inner = []            
             
-            #u_ = u.reshape(self.T, self.Nu_plus * self.D) #reshape such that rows are one u vector; I think this is correct but am confused
             u_ = u.reshape(self.Nu_plus * self.D, self.T) #reshape such that rows are one u vector
             for t in range(self.T):
-                #u_current = u_[t, :self.Nu*self.D] #go through row by row; I think this is correct but am confused
-                u_current = u_[:self.D*self.Nu, t] #go through row by row
+                u_current = u_[:self.D*self.Nu, t] #go through col by col
                 assert(len(u_current) == self.Nu * self.D)
                 Sigma_ = self.compute_sigma(L, u_current)
                 Sigma_inner.append(Sigma_)
