@@ -11,52 +11,37 @@ width=\figwidth,
 x grid style={white!69!black},
 xmin=-0.45, xmax=9.45,
 xtick style={color=black},
-xtick={-2,0,2,4,6,8,10},
-xticklabels={
-  \(\displaystyle -2\),
-  \(\displaystyle 0\),
-  \(\displaystyle 2\),
-  \(\displaystyle 4\),
-  \(\displaystyle 6\),
-  \(\displaystyle 8\),
-  \(\displaystyle 10\)
-},
 y grid style={white!69!black},
-ymin=-0.678, ymax=1.43,
+ymin=0, ymax=0.000418,
 ytick style={color=black},
-ytick={-1,0,1,2},
-yticklabels={
-  \(\displaystyle -1\),
-  \(\displaystyle 0\),
-  \(\displaystyle 1\),
-  \(\displaystyle 2\)
-}
+ytick={0,0.0002,0.0004,0.0006},
+yticklabels={0.0000,0.0002,0.0004,0.0006}
 ]
 \addplot [semithick, black]
 table {%
 0 nan
-1 1.33
-2 0.505
-3 0.155
-4 -0.0639
-5 -0.218
-6 -0.336
-7 -0.433
-8 -0.512
-9 -0.582
+1 0.000418
+2 0.000224
+3 0.000153
+4 0.000112
+5 8.85e-05
+6 7.28e-05
+7 6.12e-05
+8 5.26e-05
+9 4.59e-05
 };
 \addplot [semithick, color0]
 table {%
-0 0.387
-1 0.398
-2 0.271
-3 0.2
-4 0.154
-5 0.129
-6 0.11
-7 0.0967
-8 0.0851
-9 0.0753
+0 0.000123
+1 9.11e-05
+2 5.47e-05
+3 4.72e-05
+4 3.7e-05
+5 3.19e-05
+6 2.67e-05
+7 2.39e-05
+8 1.86e-05
+9 1.72e-05
 };
 \end{axis}
 
