@@ -1,0 +1,71 @@
+% This file was created by tikzplotlib v0.9.8.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.698,0.133,0.133}
+
+\begin{axis}[
+height=\figheight,
+tick align=outside,
+tick pos=left,
+width=\figwidth,
+x grid style={white!69!black},
+xmin=-0.45, xmax=9.45,
+xtick style={color=black},
+xtick={-2,0,2,4,6,8,10},
+xticklabels={
+  \(\displaystyle -2\),
+  \(\displaystyle 0\),
+  \(\displaystyle 2\),
+  \(\displaystyle 4\),
+  \(\displaystyle 6\),
+  \(\displaystyle 8\),
+  \(\displaystyle 10\)
+},
+y grid style={white!69!black},
+ymin=0, ymax=0.186,
+ytick style={color=black},
+ytick={0,0.1,0.2},
+yticklabels={\(\displaystyle 0.0\),\(\displaystyle 0.1\),\(\displaystyle 0.2\)}
+]
+\addplot [semithick, black]
+table {%
+0 0.186
+1 0.1
+2 0.0603
+3 0.0411
+4 0.0299
+5 0.0207
+6 0.0162
+7 0.0129
+8 0.0104
+9 0.00871
+};
+\addplot [semithick, color0]
+table {%
+0 0.027
+1 0.0148
+2 0.00837
+3 0.00677
+4 0.00512
+5 0.00326
+6 0.00284
+7 0.00233
+8 0.00191
+9 0.00168
+};
+\addplot [semithick, blue]
+table {%
+0 0.0952
+1 0.0363
+2 0.0187
+3 0.0111
+4 0.00778
+5 0.00483
+6 0.00373
+7 0.00297
+8 0.00229
+9 0.00185
+};
+\end{axis}
+
+\end{tikzpicture}
