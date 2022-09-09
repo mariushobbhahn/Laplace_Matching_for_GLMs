@@ -1,2 +1,13 @@
-exp/Dirichlet_Experiment/Bundestagswahlen
-exp/Dirichlet_Experiment/Bundestagswahlen_Wahlbezirke
+Dirichlet_Experiment/Bundestagswahlen
+Dirichlet_Experiment/data
+Dirichlet_Experiment/Bundestagswahlen_Wahlbezirke
+Derivation_Bridges/figures
+Derivation_Bridges/Outsourcing_old_stuff.ipynb
+Derivation_Bridges/PSD_cone.ipynb
+Dirichlet_Experiment/figures
+Wishart_Experiment/figures
+Gamma_Experiment/figures
+Gamma_Experiment/data
+Beta_Experiments/data
+Beta_Experiments/figures
+
